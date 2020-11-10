@@ -44,7 +44,13 @@ module Customer_Before =
 // contains the redesigned code
 module Customer_After =
 
-    type Customer = undefined
+  type Name = Name of string
+  type CustomerId = CustomerId of int
+  type Guest = {CustomerName: Name}
+  type User = {CustomerName: Name; Id: CustomerId}
+  type Customer = 
+    | Guest of Guest
+    | User of User
 
 (*
 Exercise 3b
@@ -75,9 +81,17 @@ module Connection_Before =
 
 // contains the redesigned code
 module Connection_After =
-
-
-    type Connection = undefined
+    type UtcTime = Utc of System.DateTime
+    type FileHandle = FileHandle of int
+    type Connected = {
+        StartedAt: UtcTime
+        ConnectionHandle: FileHandle
+    }
+    type DisconnectionReason = Reason of string
+    type Disconnected = {
+      ReasonForDisconnection: DisconnectionReason
+    }
+    type Connection = Connected of Connected | Disconnected of Disconnected
 
 (*
 // Exercise 3c
@@ -107,7 +121,14 @@ module Order_Before =
 // contains the redesigned code
 module Order_After =
 
-    type Order = undefined
+    type OrderId = OrderId of int
+    type Amount = Amount of float
+    type PaidOrder = {
+      OrderId: OrderId;
+      Amount: Amount;
+      PaidAt: System.DateTime;
+     }
+    type Order = Paid of PaidOrder | Unpaid of OrderId
 
 (*
 Questions for discussion:

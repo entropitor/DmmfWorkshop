@@ -70,4 +70,37 @@ type Order = {
 // Your code starts here
 
 
-type MyWorkflow = MyInputData -> MyOutputData
+(* type DiceNumber = One | Two | Three | Four | Five | Six *)
+type DiceNumber = Eyes of int // at most 6
+type Color = Red | Blue | Green | Yellow
+
+type Dice = {
+  Color: Color;
+}
+type ThrownDice = {
+  Number: DiceNumber;
+  Color: Color;
+}
+type DiceInHand = Dice list
+type DiceOnTable = ThrownDice list
+type PlayerDice = Inhand of DiceInHand | OnTable of DiceOnTable
+type Player = {
+  Name: string;
+  StartColor: Color;
+  Dice: PlayerDice;
+}
+
+type Bid = {
+  Count: int;
+  Number: DiceNumber;
+}
+type AnswerToBid = Rejection of Bid | NewBid of Bid
+
+type ThrowDice = DiceInHand -> DiceOnTable
+type Answer = Player list -> Bid -> AnswerToBid
+type CountDice = DiceOnTable -> DiceNumber -> int * DiceInHand
+
+(* let throw: ThrowDice = exn *)
+let count: CountDice = fun diceOnTable number ->
+  let c = diceOnTable |> List.filter (fun d -> d.Number = number) |> List.length
+  (c, [])

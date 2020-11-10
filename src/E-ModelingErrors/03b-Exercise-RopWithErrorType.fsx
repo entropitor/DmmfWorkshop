@@ -25,8 +25,9 @@ type Request = {
 
 type ErrorMessage =
   | NameNotBlank   // name not blank
-  | ?? of int  // name not longer than
-  | ??   // email not blank
+  | NameTooLong of int  // name not longer than
+  | EmailNotBlank   // email not blank
+  | SmtpServerError of string
 
 
 //===========================================
@@ -61,19 +62,19 @@ module RopUtil =
 
 let nameNotBlank input =
   if input.Name = "" then
-    Error ??
+    Error NameNotBlank
   else
     Ok input
 
 let name50 input =
   if input.Name.Length > 50 then
-    Error (?? 50)
+    Error (NameTooLong 50)
   else
     Ok input
 
 let emailNotBlank input =
   if input.Email = "" then
-    Error ??
+    Error EmailNotBlank
   else
     Ok input
 
@@ -125,8 +126,8 @@ let canonicalizeEmailR twoTrackInput =  // value restriction error fixed!!!
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
 
 //===========================================
 // Step 3 of the pipeline: Update the database
@@ -146,9 +147,9 @@ let updateDbR twoTrackInput =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
 
 
 //===========================================
@@ -165,8 +166,6 @@ let sendEmail (request:Request) =
 let sendEmailR twoTrackInput =
     // convert SMTP exceptions to our list
     let handler (ex:exn) = SmtpServerError ex.Message  
-       // TODO Add SmtpServerError to the Error choice type!
-       // Note that it has data associated with this choice.
     RopUtil.catchR sendEmail handler twoTrackInput
 
 // -------------------------------
@@ -174,16 +173,16 @@ let sendEmailR twoTrackInput =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
 
 unsendableRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
 
 //===========================================
 // Step 5 of the pipeline: Log the errors
@@ -202,11 +201,11 @@ let loggerR twoTrackInput =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
-|> loggerR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
+  |> loggerR
 
 //===========================================
 // Translator from error type to string
@@ -216,22 +215,22 @@ goodRequest
 
 let translateError_EN err =
     match err with
-    | ?? ->
+    | NameNotBlank ->
         "Name must not be blank"
-    | ?? i ->
+    | NameTooLong i ->
         sprintf "Name must not be longer than %i chars" i
-    | ?? ->
+    | EmailNotBlank ->
         "Email must not be blank"
     | SmtpServerError msg ->
         sprintf "SmtpServerError [%s]" msg
 
 let translateError_FR err =
     match err with
-    | ?? ->
+    | NameNotBlank ->
         "Nom ne doit pas être vide"
-    | ?? i ->
+    | NameTooLong i ->
         sprintf "Nom ne doit pas être plus long que %i caractères" i
-    | ?? ->
+    | EmailNotBlank ->
         "Email doit pas être vide"
     | SmtpServerError msg ->
         sprintf "SmtpServerError [%s]" msg
@@ -252,12 +251,12 @@ let returnMessageR translator result =
 // -------------------------------
 // test the "returnMessageR" step interactively
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
-|> loggerR
-|> returnMessageR translateError_EN
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
+  |> loggerR
+  |> returnMessageR translateError_EN
 
 
 //===========================================

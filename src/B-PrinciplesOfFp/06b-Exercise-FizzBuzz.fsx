@@ -15,22 +15,18 @@ Definition of FizzBuzz:
 *)
 
 // helper function
-let isDivisibleBy divisor n =   // question: why put the divisor first?
+let isDivisibleBy divisor n = // question: why put the divisor first?
     (n % divisor) = 0
 
 // a straightforward implementation
 let simpleFizzBuzz n =
-    if n |> isDivisibleBy 15 then
-        "FizzBuzz"    // NOTE no return keyword needed
-    else if n |> isDivisibleBy 3 then
-        "Fizz"
-    else if n |> isDivisibleBy 5 then
-        "Buzz"
-    else
-        string n
+    if n |> isDivisibleBy 15 then "FizzBuzz" // NOTE no return keyword needed
+    else if n |> isDivisibleBy 3 then "Fizz"
+    else if n |> isDivisibleBy 5 then "Buzz"
+    else string n
 
 // test it on the numbers up to 30
-[1..30] |> List.map simpleFizzBuzz
+[ 1 .. 30 ] |> List.map simpleFizzBuzz
 
 (*
 F# TIPS:
@@ -81,8 +77,8 @@ let something = myData.something
 /----- How to use a choice (union) type -----
 
 // define a choice type
-type MyData = 
-    | Something of string 
+type MyData =
+    | Something of string
     | SomethingElse of int
 
 // to create a value, use one of the cases as a constructor
@@ -90,7 +86,7 @@ let myData = Something "hello"
 let myData2 = SomethingElse 42
 
 // to deconstruct data in the choice
-let result = 
+let result =
     match myData with
     | Something str -> ...
     | SomethingElse i -> ...
@@ -98,13 +94,53 @@ let result =
 *)
 
 
+type FizzBuzz =
+    | Handled of string
+    | Unhandled of int
+
 // fizzBuzz takes an int and returns a string
-let fizzBuzz (n:int) :string =
+let fizzBuzz (n: int): string =
     // handle 15 with "FizzBuzz"
     // then handle 3 with "Fizz"
     // then handle 5 with "Buzz"
     // then handle what's left
+    let handleCase divisor result value =
+        match value with
+        | Handled _ -> value
+        | Unhandled number -> if isDivisibleBy divisor number then (Handled result) else value
+
+    let finalStep value =
+        match value with
+        | Handled value -> value
+        | Unhandled number -> string number
+
+    Unhandled n
+    |> handleCase 15 "FizzBuzz"
+    |> handleCase 3 "Fizz"
+    |> handleCase 5 "Buzz"
+    |> finalStep
 
 // test it on the numbers up to 30
-[1..30] |> List.map fizzBuzz
+[ 1 .. 30 ] |> List.map fizzBuzz
 
+type FizzBuzzRecord = {
+  result: string;
+  number: int;
+}
+let fizzBuzzRecord (n: int): string =
+  let handleCase divisor label value =
+    if value.number |> isDivisibleBy divisor then
+      {result= value.result + label; number= value.number}
+    else
+      value
+  let finalStep value = 
+    if value.result = "" then
+      string value.number
+    else
+      value.result
+      
+  ({result=""; number= n})
+    |> handleCase 3 "Fizz"
+    |> handleCase 5 "Buzz"
+    |> finalStep
+([ 1 .. 30 ] |> List.map fizzBuzzRecord) = ([ 1 .. 30 ] |> List.map fizzBuzz)

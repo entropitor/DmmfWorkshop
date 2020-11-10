@@ -122,8 +122,8 @@ let canonicalizeEmail (input:Request) =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> Result.map canonicalizeEmail
+  |> validateRequest
+  |> Result.map canonicalizeEmail
 
 //-----------------------------------------
 // Enhance this step by making a two-track version of canonicalizeEmail
@@ -138,8 +138,8 @@ let canonicalizeEmailR twoTrackInput =
 
 // test "canonicalizeEmailR"
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
 
 
 //===========================================
@@ -167,9 +167,9 @@ let updateDbR twoTrackInput =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
 
 
 //===========================================
@@ -186,9 +186,9 @@ let sendEmail (request:Request) =
 (*
 // this code will throw an exception :(
 unsendableRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> Result.map sendEmail
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> Result.map sendEmail
 *)
 
 // The fix is to convert the exception-throwing code
@@ -200,22 +200,30 @@ let sendEmailR twoTrackInput =
     // into something useful.
     RopUtil.catchR sendEmail exnConverter twoTrackInput
 
+let sendEmailR' twoTrackInput =
+    // define a handler for exceptions
+    let exnConverter (ex:exn) = ex.Message
+    // convert the exception-throwing "sendEmail"
+    // into something useful.
+    twoTrackInput
+      |> Result.bind (RopUtil.catch sendEmail exnConverter)
+
 
 // -------------------------------
 // test the "sendEmailR" step interactively
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
 
 unsendableRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
 
 //===========================================
 // Step 5 of the pipeline: Log the errors
@@ -234,11 +242,20 @@ let loggerR twoTrackInput =
 // before implementing the next step
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
-|> loggerR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
+  |> loggerR
+
+let pipeline =
+  validateRequest
+  >> canonicalizeEmailR
+  >> updateDbR
+  >> sendEmailR
+  >> loggerR
+
+badRequest1 |> pipeline
 
 //===========================================
 // Last step of the pipeline: return the response
@@ -255,12 +272,12 @@ let returnMessageR result =
 // test the "returnMessageR" step interactively
 
 goodRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbR
-|> sendEmailR
-|> loggerR
-|> returnMessageR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbR
+  |> sendEmailR
+  |> loggerR
+  |> returnMessageR
 
 
 //===========================================
@@ -282,13 +299,13 @@ let updateCustomerR input =
 // test the entire pipeline
 
 goodRequest
-|> updateCustomerR
+  |> updateCustomerR
 
 badRequest1
-|> updateCustomerR
+  |> updateCustomerR
 
 unsendableRequest
-|> updateCustomerR
+  |> updateCustomerR
 
 
 
@@ -311,12 +328,12 @@ let updateDbWithTransactionR f r =
     Result.bind (updateDbWithTransaction f) r
 
 unsendableRequest
-|> validateRequest
-|> canonicalizeEmailR
-|> updateDbWithTransactionR (fun req ->
-    Ok req
-    |> sendEmailR
-    |> loggerR
-    )
-|> returnMessageR
+  |> validateRequest
+  |> canonicalizeEmailR
+  |> updateDbWithTransactionR (fun req ->
+      Ok req
+      |> sendEmailR
+      |> loggerR
+      )
+  |> returnMessageR
 *)

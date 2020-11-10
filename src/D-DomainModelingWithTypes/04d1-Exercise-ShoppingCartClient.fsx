@@ -51,7 +51,9 @@ module ShoppingCartClient =
         | ActiveCartState activeCartData ->
             printfn "Adding item %s to active cart" newItem
             ShoppingCartApi.addToActive (newItem,activeCartData)
-        // | paid -> what here?
+        | PaidCartState paid ->
+            printfn "Doing nothing because already paid"
+            cart
 
     // "clientPayForCart " changes the cart state after paying
     // function signature should be
@@ -61,8 +63,10 @@ module ShoppingCartClient =
         | EmptyCartState ->
             printfn "Can't pay for empty cart"
             cart // return original cart
-        // | active -> return new state
-        // | paid ->
+        | ActiveCartState active -> 
+            ShoppingCartApi.pay (3.0,active)
+        | PaidCartState _paid ->
+            cart
 
 
     // "clientRemoveItem " changes the cart state after removing an item
@@ -73,7 +77,11 @@ module ShoppingCartClient =
         | EmptyCartState ->
             printfn "Can't remove item from empty cart"
             cart
-        //| ActiveCartState activeCartData -> ??
+        | ActiveCartState active ->
+            printfn "Removing %A from %A" itemToRemove cart
+            ShoppingCartApi.removeFromActive (itemToRemove,active)
+        | PaidCartState _paid ->
+            cart
 
 
 // ================================================

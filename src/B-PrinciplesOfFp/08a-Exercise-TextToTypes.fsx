@@ -81,7 +81,7 @@ type undefined = exn
 data PersonalName = FirstName AND LastName
 *)
 
-type PersonalName = ??
+type PersonalName = { FirstName: string; LastName: string }
 
 (*
 ------------------------------------------
@@ -91,10 +91,15 @@ data OrderLine =
     AND OrderQuantity
 *)
 
-type OrderId = ??
-type Product = ??
-type OrderQuantity = ??
-type OrderLine = ??
+type OrderId = OrderId of int
+type ProductId = ProductId of int
+type Product = { ProductId: ProductId }
+type OrderQuantity = OrderQuantity of int
+
+type OrderLine =
+    { OrderId: OrderId
+      Product: Product
+      OrderQuantity: OrderQuantity }
 
 (*
 ------------------------------------------
@@ -105,9 +110,13 @@ data Blog =
 data BlogName = all printable chars, maxlen = 100
 *)
 
-type BlogName = ??
-type BlogPost = ??
-type Blog = ??
+type String100 = String100 of string
+type BlogName = String100
+type BlogPost = String
+
+type Blog =
+    { BlogName: BlogName
+      Posts: BlogPost list }
 
 
 (*
@@ -123,10 +132,30 @@ data Hoodie =
   OR Small (with HoodieColorSmall)
 *)
 
-type TShirtColor = ??
-type TShirt = ??
+type TShirtColor =
+    | Black
+    | Red
+    | Blue
 
-type Hoodie = ??
+type TShirtSize =
+    | Large
+    | Small
+
+type TShirt =
+    { Size: TShirtSize
+      Color: TShirtColor }
+
+type HoodieColorSmall =
+    | Black
+    | White
+
+type HoodieColorLarge =
+    | Red
+    | Blue
+
+type Hoodie =
+    | Large of HoodieColorLarge
+    | Small of HoodieColorSmall
 
 
 (*
@@ -137,8 +166,13 @@ data ShippingMethod =
   OR Express (with ExpressShippingType)
 *)
 
-type ExpressShippingType = ??
-type ShippingMethod = ??
+type ExpressShippingType =
+    | OneDay
+    | TwoDay
+
+type ShippingMethod =
+    | Standard
+    | Express of ExpressShippingType
 
 
 (*

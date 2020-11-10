@@ -35,8 +35,8 @@ module TicTacToe =
     // when making a move
     type MoveError =
       | PlayedSameSquare of Square
-      | ??
-      | ??
+      | AlreadyEnded
+      | NotYourTurn
 
 
     // In the main workflow , use a Result as the output
@@ -64,7 +64,9 @@ module AtmCashMachine =
     // when withdrawing money
     type WithdrawalError =
         | CardNotAcceptedHere
-        | ??
+        | NotEnoughMoney
+        | WrongPIN
+        | CardExpired
 
     // In the main workflow , use a Result as the output
     type WithdrawMoney =
@@ -95,7 +97,9 @@ module CoffeeMaker =
     // when making coffee
 
     /// Tell the user that their coffee was not made
-    type CoffeeMakingError = ??
+    type CoffeeMakingError =
+      | MissingIngredient of CoffeeChoice
+      | Busy
 
 
     // In the main workflow , use a Result as the output

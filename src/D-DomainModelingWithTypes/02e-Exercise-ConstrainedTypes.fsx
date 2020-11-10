@@ -21,16 +21,13 @@ module ConstrainedTypes =
     type NonZeroInteger = private NonZeroInteger of int
 
     module NonZeroInteger =
-        // TODO: Implement public constructor
         let create i =
-            //what goes here?
             if i <> 0 then
-                notImplemented()
+              Some (NonZeroInteger i)
+            else
+              None
 
-        // TODO: Implement a function that returns the value
-        let value ??  =
-            //what goes here?
-            ??
+        let value (NonZeroInteger i)  = i
 
 
 // --------------------------------
@@ -65,11 +62,12 @@ module ConstrainedTypes2 =
                 let isAllDigits = s |> Seq.forall Char.IsDigit
                 (s.Length = 5) && isAllDigits
 
-            // construct the ZipCode
-            ??
+            if is5Digits s then
+              Some (ZipCode s)
+            else
+              None
 
-        /// TODO Return the value
-        let value ?? = ??
+        let value (ZipCode z) = z
 
 
 
@@ -85,4 +83,3 @@ let zip1 = zip1Option |> Option.get  // dont do this except for testing!
 let zip2Option = ZipCode.create "abc"
 
 let zip3Option = ZipCode.create "123456"
-

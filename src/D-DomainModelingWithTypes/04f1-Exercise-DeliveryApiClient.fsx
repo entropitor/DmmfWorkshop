@@ -24,7 +24,6 @@ open DeliveryApiImplementation
 open DeliveryApiImplementation.DeliveryDomain
 open DeliveryApiImplementation.DeliveryApi
 
-
 // ================================================
 // Now write some client code that uses this API
 // ================================================
@@ -41,8 +40,12 @@ module DeliveryClient =
             DeliveryApi.sendOutForDelivery data truckId
         | OutForDeliveryState _ ->
             printfn "package already out"
-            ??
-        | DeliveredState _ -> ??
+            state
+        | DeliveredState _ -> 
+            printfn "package already delivered"
+            state
+        | FailedDeliveryState failed ->
+            DeliveryApi.redeliver failed truckId
 
 
     let markAsDelivered (signature:Signature) state =
@@ -50,18 +53,24 @@ module DeliveryClient =
         // if OutForDelivery, use "signedFor"
         // in all other cases, print a warning and return the original state
         match state with
-        | UndeliveredState _  -> ??
-        | OutForDeliveryState data -> ??
+        | FailedDeliveryState _
+        | DeliveredState _
+        | UndeliveredState _ ->
+            printfn "Package in state %A" state
+            state
+        | OutForDeliveryState data -> DeliveryApi.signedFor data signature
 
     let markAddressNotFound state =
         // Logic is:
         // if OutForDelivery, use "addressNotFound"
         // in all other cases, print a warning and return the original state
         match state with
+        | FailedDeliveryState _
+        | DeliveredState _
         | UndeliveredState _  ->
             printfn "package not out"
             state // return original state
-        | OutForDeliveryState data -> ??
+        | OutForDeliveryState data -> DeliveryApi.addressNotFound data
 
 
 

@@ -53,18 +53,23 @@ module DeliveryApi =
 
     /// Information about a package in an OutForDelivery state
     type OutForDeliveryData = {
-        Package : Package
-        // add TruckId, AttemptedAt fields
+      Package : Package;
+        TruckId: TruckId;
+        AttemptedAt: DeliveryTimestamp;
         }
 
     /// Information about a package in a Delivered state
     type DeliveredData = {
-        Package : Package
-        // add Signature and DeliveredAt fields
+      Package : Package;
+      Signature: Signature;
+      DeliveredAt: DeliveryTimestamp;
         }
 
     /// Information about a package in an FailedDelivery state
-    type FailedDeliveryData = undefined
+    type FailedDeliveryData = {
+      Package : Package;
+      FailedAt: DeliveryTimestamp;
+    }
 
     // Create a "state" type that represents the union of all the states
     type ShipmentState =
@@ -80,10 +85,10 @@ module DeliveryApi =
     type SendOutForDelivery = UndeliveredData -> TruckId -> ShipmentState
 
     /// "SignedFor" transitions to DeliveredState given OutForDelivery data and a Signature
-    type SignedFor = undefined
+    type SignedFor = OutForDeliveryData * Signature -> ShipmentState
 
     /// "AddressNotFound" transitions to FailedDeliveryState given OutForDelivery data
-    type AddressNotFound = undefined
+    type AddressNotFound = OutForDeliveryData * DeliveryTimestamp -> ShipmentState
 
     /// "Redeliver" transitions to OutForDeliveryState given FailedDelivery data and TruckId
-    type Redeliver = undefined
+    type Redeliver = FailedDeliveryData * TruckId -> ShipmentState

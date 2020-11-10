@@ -41,9 +41,16 @@ module Calendar =
             | _ -> failwith "input is not a DayOfWeek"
 
     module ExtendedOutputDesign =
-        // Exercise: convert the function to be total
-        //           by extending the output.
-        let strToDayOfWeek s = notImplemented()
+        let strToDayOfWeek s =
+            match s with
+            | "Sunday" | "Sun" -> Some Sun
+            | "Monday" | "Mon" -> Some Mon
+            | "Tuesday" | "Tue" -> Some Tue
+            | "Wednesday" | "Wed" -> Some Wed
+            | "Thursday" | "Thu" -> Some Thu
+            | "Friday" | "Fri" -> Some Fri
+            | "Saturday" | "Sat" -> Some Sat
+            | _ -> None
 
 
 // test the function
@@ -71,13 +78,11 @@ module IntUtil =
             | false, _ -> failwith "input is not an int"
 
     module ExtendedOutputDesign =
-        // Exercise: Convert this function to be total
-        //           by extending the output.
-        // Reuse the "match System.Int32.TryParse" code
-        // but return something different
-        //
-        // Question: Should it have a different name?
-        let strToInt s = notImplemented()
+        let strToInt (s:string) =
+            // this is how to parse an int
+            match System.Int32.TryParse s with
+            | true, i -> Some i
+            | false, _ -> None
 
 // test the function
 IntUtil.ExceptionBasedDesign.strToInt "123"     // good
@@ -115,7 +120,10 @@ module ListUtil =
         // Exercise: Convert this function to be total
         //           by extending the output.
         // Should it have a different name?
-        let firstItem aList = notImplemented()
+        let firstItem aList = 
+          match aList with
+          | [] -> None
+          | head::_ -> Some head
 
 let emptyList :int list = []
 // NOTE: the :int list is just to get around an issue working interactively!

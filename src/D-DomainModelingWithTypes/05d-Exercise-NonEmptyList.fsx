@@ -10,19 +10,18 @@
 // -----------------------------------
 
 let notImplemented() = failwith "not implemented"
+
 type undefined = exn
 
 // Exercise: define a type "NonEmptyList"
 //           so that "firstItem" always works
-type NonEmptyList<'a> = undefined
+type NonEmptyList<'a> = 'a * 'a list
 
 /// Helper functions for NonEmptyList
 module NonEmptyList =
 
     /// Returns the first item in a NonEmptyList
-    let first (aNonEmptyList:NonEmptyList<'a>) =
-        // Exercise: implement this
-        notImplemented()
+    let first (aNonEmptyList: NonEmptyList<'a>) = fst aNonEmptyList
 
     /// Convert a normal list to a NonEmptyList
     let fromList aList =
@@ -33,20 +32,22 @@ module NonEmptyList =
         // Exercise: implement this
         match aList with
         // input is an empty list
-        | [] ->
-            notImplemented()
+        | [] -> None
         // input is a non-empty list
-        | first::rest ->
-            notImplemented()
+        | first :: rest -> Some(first, rest)
 
 
 
     /// Returns a tuple of the first item
     /// and the rest of the list (as an NonEmptyList option)
-    let split (aNonEmptyList:NonEmptyList<'a>) =
+    let split (aNonEmptyList: NonEmptyList<'a>) =
         // Exercise: implement this
-        let first : 'a = notImplemented()
-        let rest : NonEmptyList<'a> option = notImplemented()
+        let first: 'a = fst aNonEmptyList
+
+        let rest: NonEmptyList<'a> option =
+            aNonEmptyList
+            |> snd
+            |> fromList
         (first, rest)
 
 
@@ -55,16 +56,13 @@ module NonEmptyList =
 let showFirstItem aList =
     let nonEmptyListOpt = NonEmptyList.fromList aList
     match nonEmptyListOpt with
-    | Some nonEmptyList ->
-        NonEmptyList.first nonEmptyList // always succeeds
-        |> printfn "The first item is %A"
-    | None ->
-        printfn "Input is not valid"
+    | Some nonEmptyList -> NonEmptyList.first nonEmptyList |> printfn "The first item is %A" // always succeeds
+    | None -> printfn "Input is not valid"
 
 
 // test the function
-showFirstItem [1;2;3]  // good
-showFirstItem []       // bad
+showFirstItem [ 1; 2; 3 ] // good
+showFirstItem [] // bad
 
 
 // -----------------------------------
@@ -74,15 +72,25 @@ showFirstItem []       // bad
 
 
 module CardGame =
-    type Suit = Heart | Spade | Club
-    type Rank = Ace | King | Queen
+    type Suit =
+        | Heart
+        | Spade
+        | Club
+
+    type Rank =
+        | Ace
+        | King
+        | Queen
+
     type Card = Suit * Rank
+
     type ShuffledDeck = ShuffledDeck of NonEmptyList<Card>
-    type Deal = ShuffledDeck -> Card * ShuffledDeck option
+
+    type Deal = ShuffledDeck -> (Card * ShuffledDeck option)
 
     // the implementation of Deal
-    let deal : Deal =
+    let deal: Deal =
         fun (ShuffledDeck cardList) ->
-            let first,rest = ??
+            let first, rest = NonEmptyList.split cardList
             let newDeckOpt = rest |> Option.map (fun list -> ShuffledDeck list)
             first, newDeckOpt

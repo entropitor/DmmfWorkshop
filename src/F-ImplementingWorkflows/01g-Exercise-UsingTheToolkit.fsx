@@ -95,7 +95,7 @@ let createValidCustomer : CreateValidCustomer =
         // Exercise: create the customer by using the "createCustomer" function
         // Tip: use the "lift3" function on createCustomer (because there are three parameters)
         let customerOrError =
-            createCustomer nameOrError emailOrError bdateOrError
+            (Result.lift3 createCustomer) nameOrError emailOrError bdateOrError
 
         customerOrError
 
@@ -129,8 +129,8 @@ let processCustomerDto (jsonOrError:Result<Json,WorkflowError>) =
     // Exercise: Eliminate the compiler errors
     // by using Result.map or Result.bind as needed
     jsonOrError             // NOTE:this is two-track input
-    |> decodeCustomerDto    // Json -> DTO
-    |> createValidCustomer' // DTO -> Customer
+    |> Result.bind decodeCustomerDto    // Json -> DTO
+    |> Result.bind createValidCustomer' // DTO -> Customer
 
 // type signature is:
 // val processCustomerDto : jsonOrError:Result<Json,WorkflowError> -> Result<Customer,WorkflowError>
@@ -140,9 +140,9 @@ let processCustomerDto (jsonOrError:Result<Json,WorkflowError>) =
 // by using one of Async.map/Async.bind/AsyncResult.map/AsyncResult.bind
 let downloadAndStoreCustomer url =
     url
-    |> downloadFile        // download -> Json
-    |> processCustomerDto  // Json -> Customer
-    |> storeCustomerInDb   // Customer -> database
+    |> AsyncResult.bind downloadFile        // download -> Json
+    |> Async.map processCustomerDto  // Json -> Customer
+    |> AsyncResult.bind storeCustomerInDb   // Customer -> database
 
 // type signature is:
 // val downloadAndStoreCustomer : url:Url -> AsyncResult<unit,WorkflowError>

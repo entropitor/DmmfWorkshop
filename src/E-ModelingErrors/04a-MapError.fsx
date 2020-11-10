@@ -104,3 +104,16 @@ let functionAThenB_v2 apple =
     apple
     |> functionA'
     |> Result.bind functionB'
+
+let functionAThenB_v3 apple =
+    // now build the pipeline
+    apple
+    |> (functionA >> Result.mapError AppleErrorCase)
+    |> Result.bind (functionB >> Result.mapError BananaErrorCase)
+
+let functionAThenB_v4 apple =
+    // now build the pipeline
+    apple
+    |> functionA 
+    |> Result.mapError AppleErrorCase
+    |> Result.bind (functionB >> Result.mapError BananaErrorCase)

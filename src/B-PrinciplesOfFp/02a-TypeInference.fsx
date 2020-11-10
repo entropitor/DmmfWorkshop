@@ -7,16 +7,15 @@
 
 // example from the slides
 let doSomething f x =
-   let y = f (x + 1)
-   "hello" + y
+    let y = f (x + 1)
+    "hello" + y
 
 // val doSomething : f:(int -> string) -> x:int -> string
 
 
 // =================================
 // Example 1 - type inference
-let printName aName =
-    printfn "Hello %s" aName
+let printName aName = printfn "Hello %s" aName
 
 // test
 let name = "Alice"
@@ -30,7 +29,7 @@ and generates a "unit" as output. For now, you can think of the unit type as som
 It means that there is no useful output.
 *)
 
-let returnHello() =    // () means no input
+let returnHello () = // () means no input
     "Hello"
 
 // val returnHello : unit -> string
@@ -39,8 +38,7 @@ let returnHello() =    // () means no input
 // =================================
 // Example 2 - defining a function with an int parameter
 //              causes type errors
-let printName2 aName =
-    printfn "Hello %i" aName
+let printName2 aName = printfn "Hello %i" aName
 
 // test -- uncomment below
 (*
@@ -56,8 +54,7 @@ printName2 name
 
 // =================================
 // Example 3 - defining a function with two int parameters
-let printIntAndString anInt aStr =
-    printfn "int=%i str=%s" anInt aStr
+let printIntAndString anInt aStr = printfn "int=%i str=%s" anInt aStr
 
 // test
 printIntAndString 1 "hello"
@@ -85,13 +82,12 @@ let toUpper x =
 *)
 
 // the same definition but with a type annotation. Now the compiler is happy.
-let toUpper (x:string) =
-    x.ToUpper()
+let toUpper (x: string) = x.ToUpper()
 
 
 // Here's how to do type annotations
-let aFunction (param1:string) (param2:bool) :string =
-//             ^1st param      ^2nd param    ^return type
+let aFunction (param1: string) (param2: bool): string =
+    //             ^1st param      ^2nd param    ^return type
     // etc
     "" // dummy
 
@@ -103,20 +99,16 @@ let toUpper x :string = ...
 // Here's some different ways of writing the same function...
 
 // version 1: no type annotations
-let helloInt_v1 anInt =
-    sprintf "Hello %i" anInt
+let helloInt_v1 anInt = sprintf "Hello %i" anInt
 
 // version 2: annotation on parameter only
-let helloInt_v2 (anInt:int) =
-    sprintf "Hello %i" anInt
+let helloInt_v2 (anInt: int) = sprintf "Hello %i" anInt
 
 // version 3: annotation on return value only
-let helloInt_v3 anInt :string =
-    sprintf "Hello %i" anInt
+let helloInt_v3 anInt: string = sprintf "Hello %i" anInt
 
 // version 4: annotation on parameter and return value
-let helloInt_v4 (anInt:int) :string =
-    sprintf "Hello %i" anInt
+let helloInt_v4 (anInt: int): string = sprintf "Hello %i" anInt
 
 // type annotations are useful when you are getting started,
 // or if the compiler complains
@@ -147,6 +139,7 @@ T returnSameThing<T>(T x) {
 
 let ignoreTheInput x = ()
 let ignoreTwoInputs x y = ()
+
 let ignoreThreeInputs x y z = ()
 
 (*
@@ -154,4 +147,3 @@ val ignoreTheInput : x:'a -> unit
 val ignoreTwoInputs : x:'a -> y:'b -> unit
 val ignoreThreeInputs : x:'a -> y:'b -> z:'c -> unit
 *)
-

@@ -50,15 +50,26 @@ module PureImplementation =
     //  3. update customer and also send email
     type WorkflowResult =
         | NoChange
-        | ??
+        | UpdateCustomer of Domain.Customer
+        | Email of EmailServer.EmailMessage * Domain.Customer
 
     // Pure business logic -- decisions only -- no I/O
     let updateCustomer (newCustomer:Domain.Customer) (existingCustomer:Domain.Customer) : WorkflowResult =
-        // 1. decide whether a verification email should be sent
-        // 2. decide whether the database should be updated
+        if (existingCustomer.Name <> newCustomer.Name) ||
+           (existingCustomer.EmailAddress <> newCustomer.EmailAddress) then
+            // store updated customer
+            UpdateCustomer newCustomer
 
-        // Exercise -- implement this logic without any IO
-        ???
+        // send verification email if email changed
+        else if (existingCustomer.EmailAddress <> newCustomer.EmailAddress) then
+            let emailMessage : EmailServer.EmailMessage = {
+                EmailAddress = newCustomer.EmailAddress
+                EmailBody = "Please verify your new email"
+                }
+            Email (emailMessage, newCustomer)
+
+        else
+          NoChange
 
 module PureImplementation_Shell =
     open PureImplementation
@@ -70,11 +81,14 @@ module PureImplementation_Shell =
         let existingCustomer = CustomerDatabase.readCustomer newCustomer.Id
 
         // pure business logic
-        let result = PureImplementation.updateCustomer ??
+        let result = PureImplementation.updateCustomer newCustomer existingCustomer
 
         // impure
         match result with
         | NoChange ->
             ()  // do nothing
-        | ?? ->
-           // Exercise -- implement the remaining IO
+        | UpdateCustomer updated ->
+            CustomerDatabase.updateCustomer updated
+        | Email (emailMessage, updated) ->
+            CustomerDatabase.updateCustomer updated
+            EmailServer.sendMessage emailMessage

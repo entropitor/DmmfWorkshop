@@ -22,19 +22,21 @@ Exercise:
 
 module CardGame =
 
-    type Suit = ??
-    type Rank = ??
-    type Card = ??
+    type Suit = Heart | Spade | Diamand | Clubs
+    type Rank = Two | Three | Four | Five
+    type Card = Suit * Rank
 
-    type Hand = ??
-    type Deck = ??
+    type Hand = Card list
+    type Deck = Card list
+    type ShuffledDeck = ShuffledDeck of Deck
 
-    type Player = ??
-    type Game = ??
+    type Name = string
+    type Player = Name * Hand
+    type Game = Deck * Player list
 
-    type Deal = ??
-    type PickUp = ??
-    type Shuffle = ??
+    type Deal = ShuffledDeck -> Card option * ShuffledDeck
+    type PickUp = Card * Hand -> Hand
+    type Shuffle = Deck -> ShuffledDeck
 
     (*
     // Sidebar: How do you add extra behavior,
@@ -61,25 +63,20 @@ module CardGameImplementation =
 
     // optionally implement some functions here
 
-    (*
     let pickup : PickUp =
         fun (card,hand) ->
             // the "::" operator prepends the card to the hand
             let newHand = card::hand
             newHand
-    *)
 
-    (*
     let deal : Deal =
         fun (ShuffledDeck deck) ->
             // the "::" pattern deconstructs a non-empty list into head/tail
             match deck with
-            | first::rest -> first, ShuffledDeck rest
-            | [] -> // what goes here?
-    *)
+            | first::rest -> Some first, ShuffledDeck rest
+            | [] -> None, ShuffledDeck deck// what goes here?
 
 
-    (*
     let shuffle : Shuffle =
         fun deck ->
             // don't worry about how to do proper shuffling
@@ -88,6 +85,5 @@ module CardGameImplementation =
             deck
             |> List.map (fun card -> random.Next(), card )  // add a random to each card
             |> List.sortBy (fun (rand,card) -> rand)        // sort
-            |> List.map ??                                  // remove the random number
-            |> ??
-    *)
+            |> List.map (fun (_rand, card) -> card)         // remove the random number
+            |> ShuffledDeck

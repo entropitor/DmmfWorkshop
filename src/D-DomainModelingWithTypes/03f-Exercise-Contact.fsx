@@ -51,7 +51,7 @@ type BadContact = {
 
   EmailAddress: string
   IsEmailVerified: bool
-  }
+    }
 
 
 
@@ -60,17 +60,18 @@ type BadContact = {
 // ----------------------------------------
 module ConstrainedTypes =
 
-    type String1 =
-    type String50 =
-    type EmailAddress =
+    type String1 =String1 of string
+    type String50 = String50 of string
+    type EmailAddress =Email of string
 
 // ----------------------------------------
 // and a VerificationService module?
 // ----------------------------------------
 
 module VerificationService =
+    open ConstrainedTypes
 
-    type VerifiedEmail = ??
+    type VerifiedEmail = VerifiedEmail of EmailAddress
 
 
 // ----------------------------------------
